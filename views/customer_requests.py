@@ -1,35 +1,37 @@
 CUSTOMERS = [
     {
-      "id": 1,
-      "name": "Sydney Noh test",
-      "address": "976 Software School Rd.",
-      "email": "noh@gmail.com"
+        "id": 1,
+        "name": "Grace",
+        "age": 24
     },
     {
-      "id": 2,
-      "name": "Trevor Guinn ",
-      "address": "123 NSS Ln",
-      "email": "trevor@gmail.com"
+        "id": 2,
+        "name": "Josh",
+        "age": 18
     },
     {
-      "id": 3,
-      "name": "Ella Johnson",
-      "address": "76 Vet street",
-      "email": "ella@gmail.com"
+        "id": 3,
+        "name": "Jeff",
+        "age": 37
     },
     {
-      "id": 4,
-      "name": "Tom Jackson",
-      "address": "20 ABC street",
-      "email": "tom@gmail.com"
+        "id": 4,
+        "name": "Jamal",
+        "age": 41
     },
     {
-      "id": 5,
-      "name": "Nate King",
-      "address": "100 Jane street",
-      "email": "nate@gmail.com"
+        "id": 5,
+        "name": "Megan",
+        "age": 28
+    },
+    {
+        "id": 6,
+        "name": "Caroline",
+        "age": 64
     }
 ]
+
+from .animal_requests import get_animal_bycustomerId
 
 def get_all_customers():
     return CUSTOMERS
@@ -78,3 +80,10 @@ def delete_customer(id):
     # If the animal was found, use pop(int) to remove it from list
     if customer_index >= 0:
         CUSTOMERS.pop(customer_index)
+        
+def customer_animal():
+    # Initial -1 value for animal index, in case one isn't found
+    for customer in CUSTOMERS:
+        customerlist =  get_animal_bycustomerId(customer["id"])
+        for custobj in customerlist
+            print(customer, custobj)

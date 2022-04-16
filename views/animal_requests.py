@@ -3,25 +3,37 @@ ANIMALS = [
         "id": 1,
         "name": "Snickers",
         "species": "Dog",
-        "locationId": 1,
-        "customerId": 4,
-        "status": "Admitted"
+        "customerId": 4
     },
     {
         "id": 2,
-        "name": "Roman",
+        "name": "Brixton",
         "species": "Dog",
-        "locationId": 1,
-        "customerId": 2,
-        "status": "Admitted"
+        "customerId": 1
     },
     {
         "id": 3,
         "name": "Blue",
         "species": "Cat",
-        "locationId": 2,
-        "customerId": 1,
-        "status": "Admitted"
+        "customerId": 5
+    },
+    {
+        "id": 4,
+        "name": "Micky",
+        "species": "Mouse",
+        "customerId": 2
+    },
+    {
+        "id": 5,
+        "name": "Scooby",
+        "species": "Dog",
+        "customerId": 6
+    },
+    {
+        "id": 6,
+        "name": "Jack",
+        "species": "Rabbit",
+        "customerId": 3
     }
 ]
 
@@ -79,4 +91,18 @@ def update_animal(id, new_animal):
         if animal["id"] == id:
             # Found the animal. Update the value.
             ANIMALS[index] = new_animal
-            break        
+            break   
+
+def get_animal_bycustomerId(id):
+    # Variable to hold the found animal, if it exists
+    animalbycustomerId = []
+
+    # Iterate the ANIMALS list above. Very similar to the
+    # for..of loops you used in JavaScript.
+    for animal in ANIMALS:
+        # Dictionaries in Python use [] notation to find a key
+        # instead of the dot notation that JavaScript used.
+        if animal["customerId"] == id:
+            animalbycustomerId = animalbycustomerId.append(animal)
+
+    return animalbycustomerId          

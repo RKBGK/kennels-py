@@ -1,6 +1,6 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_animals, get_single_animal, get_all_locations, get_single_location, get_all_employees, get_single_employee, create_animal, create_employee, create_location, get_all_customers, get_single_customer, create_customer, delete_animal, delete_employee, delete_location, delete_customer, update_animal
+from views import get_all_animals, get_single_animal, get_all_locations, get_single_location, get_all_employees, get_single_employee, create_animal, create_employee, create_location, get_all_customers, get_single_customer, create_customer, delete_animal, delete_employee, delete_location, delete_customer, update_animal, customer_animal
 
 
 # Here's a class. It inherits from another class.
@@ -74,7 +74,6 @@ class HandleRequests(BaseHTTPRequestHandler):
             # In JavaScript, you would call it an array of objects
             if id is not None:
                 response = f"{get_single_animal(id)}"
-
             else:
                 response = f"{get_all_animals()}"
         elif resource == "locations":
@@ -191,6 +190,7 @@ def main():
     host = ''
     port = 8088
     HTTPServer((host, port), HandleRequests).serve_forever()
+    customer_animal()
 
 
 if __name__ == "__main__":
