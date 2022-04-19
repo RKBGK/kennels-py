@@ -31,8 +31,6 @@ CUSTOMERS = [
     }
 ]
 
-from .animal_requests import get_animal_bycustomerId
-
 def get_all_customers():
     return CUSTOMERS
 
@@ -81,9 +79,3 @@ def delete_customer(id):
     if customer_index >= 0:
         CUSTOMERS.pop(customer_index)
         
-def customer_animal():
-    # Initial -1 value for animal index, in case one isn't found
-    for customer in CUSTOMERS:
-        customerlist =  get_animal_bycustomerId(customer["id"])
-        for custobj in customerlist
-            print(customer, custobj)

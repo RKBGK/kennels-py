@@ -37,6 +37,9 @@ ANIMALS = [
     }
 ]
 
+import sqlite3
+import json
+
 def get_all_animals():
     return ANIMALS
 

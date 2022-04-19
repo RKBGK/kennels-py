@@ -68,6 +68,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
         # Your new console.log() that outputs to the terminal
         print(self.path)
+        customer_animal()
         # It's an if..else statement
         if resource == "animals":
             # In Python, this is a list of dictionaries
@@ -190,7 +191,7 @@ def main():
     host = ''
     port = 8088
     HTTPServer((host, port), HandleRequests).serve_forever()
-    customer_animal()
+    
 
 
 if __name__ == "__main__":
