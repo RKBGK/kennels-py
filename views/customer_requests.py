@@ -1,51 +1,44 @@
-CUSTOMERS = [
-    {
-        "id": 1,
-        "name": "Grace",
-        "age": 24
-    },
-    {
-        "id": 2,
-        "name": "Josh",
-        "age": 18
-    },
-    {
-        "id": 3,
-        "name": "Jeff",
-        "age": 37
-    },
-    {
-        "id": 4,
-        "name": "Jamal",
-        "age": 41
-    },
-    {
-        "id": 5,
-        "name": "Megan",
-        "age": 28
-    },
-    {
-        "id": 6,
-        "name": "Caroline",
-        "age": 64
-    }
-]
-
+import sqlite3
+import json
+from models import Customer
+selectsql = """ SELECT a.id, a.name, a.address, a.email, a.password FROM customer a  """
+selectwhere = selectsql + """  WHERE a.id = ?"""
+selectemail = selectsql + """  WHERE a.email = ?"""
 def get_all_customers():
-    return CUSTOMERS
+    # Open a connection to the database
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+
+        # Just use these. It's a Black Box.
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Write the SQL query to get the information you want
+        db_cursor.execute(selectsql)
+
+        # Initialize an empty list to hold all animal representations
+        customers = []
+
+        # Convert rows of data into a Python list
+        dataset = db_cursor.fetchall()
+
+        # Iterate list of data returned from database
+        for row in dataset:
+
+            customer = Customer(row['id'], row['name'], row['address'], row['email'], row['password'])
+            customers.append(customer.__dict__)
+
+    # Use `json` package to properly serialize list as JSON
+    return json.dumps(customers)
 
 def get_single_customer(id):
     # Variable to hold the found animal, if it exists
-    requested_customer = None
-
-    # Iterate the ANIMALS list above. Very similar to the
-    # for..of loops you used in JavaScript.
-    for customer in CUSTOMERS:
-        # Dictionaries in Python use [] notation to find a key
-        # instead of the dot notation that JavaScript used.
-        if customer["id"] == id:
-            requested_customer = customer
-    return requested_customer
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute(selectwhere , ( id, ))
+        data = db_cursor.fetchone()
+        customer = Customer(data['id'], data['name'], data['address'], data['email'], data['password'])
+        return json.dumps(customer.__dict__)
 
 # Function to add a location
 def create_customer(customer):
@@ -78,4 +71,22 @@ def delete_customer(id):
     # If the animal was found, use pop(int) to remove it from list
     if customer_index >= 0:
         CUSTOMERS.pop(customer_index)
-        
+    
+def get_customers_by_email(email):
+
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Write the SQL query to get the information you want
+        db_cursor.execute(selectemail , ( email, ))
+
+        customers = []
+        dataset = db_cursor.fetchall()
+
+        for row in dataset:
+            customer = Customer(row['id'], row['name'], row['address'], row['email'] , row['password'])
+            customers.append(customer.__dict__)
+
+    return json.dumps(customers)    
+    

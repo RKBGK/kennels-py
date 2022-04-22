@@ -1,48 +1,46 @@
-EMPLOYEES = [
-    {
-      "id": 1,
-      "name": "Denise",
-      "locationId": 1
-    },
-    {
-      "id": 2,
-      "name": "Jacky",
-      "locationId": 3
-    },
-    {
-      "id": 3,
-      "name": "Nick",
-      "locationId": 2
-    },
-    {
-      "id": 4,
-      "name": "Jason",
-      "locationId": 1
-    },
-    {
-      "id": 5,
-      "name": "DJ",
-      "locationId": 2
-    }
-]
-
+import sqlite3
+import json
+from models import Employee
+selectsql = """ SELECT a.id, a.name, a.address, a.location_id FROM employee a  """
+selectwhere = selectsql + """ WHERE a.id = ?"""
+selectlocation = selectsql + """ WHERE a.location_id = ?"""
 def get_all_employees():
-    return EMPLOYEES
+    # Open a connection to the database
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+
+        # Just use these. It's a Black Box.
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Write the SQL query to get the information you want
+        db_cursor.execute(selectsql)
+
+        # Initialize an empty list to hold all animal representations
+        employees = []
+
+        # Convert rows of data into a Python list
+        dataset = db_cursor.fetchall()
+
+        # Iterate list of data returned from database
+        for row in dataset:
+
+            employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
+            employees.append(employee.__dict__)
+
+    # Use `json` package to properly serialize list as JSON
+    return json.dumps(employees)
+
 
 # Function with a single parameter
 def get_single_employee(id):
     # Variable to hold the found animal, if it exists
-    requested_employee = None
-
-    # Iterate the ANIMALS list above. Very similar to the
-    # for..of loops you used in JavaScript.
-    for employee in EMPLOYEES:
-        # Dictionaries in Python use [] notation to find a key
-        # instead of the dot notation that JavaScript used.
-        if employee["id"] == id:
-            requested_employee = employee
-
-    return requested_employee
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute(selectwhere , ( id, ))
+        data = db_cursor.fetchone()
+        employee = Employee(data['id'], data['name'], data['address'], data['location_id'])
+        return json.dumps(employee.__dict__)
 
 # Function to add an employee
 def create_employee(employee):
@@ -75,3 +73,19 @@ def delete_employee(id):
     # If the animal was found, use pop(int) to remove it from list
     if employee_index >= 0:
         EMPLOYEES.pop(employee_index)  
+
+def get_employee_by_location(location_id):
+    # Open a connection to the database
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute(selectlocation, (location_id, ))
+        employees = []
+        dataset = db_cursor.fetchall()
+        for row in dataset:
+            employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
+            employees.append(employee.__dict__)
+
+    # Use `json` package to properly serialize list as JSON
+    return json.dumps(employees)

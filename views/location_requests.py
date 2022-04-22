@@ -1,36 +1,43 @@
-LOCATIONS = [
-    {
-      "id": 1,
-      "name": "Nashville North ",
-      "address": "8422 Johnson Pike E"
-    },
-    {
-      "id": 2,
-      "name": "Nashville South",
-      "address": "209 Emory Drive"
-    },
-    {
-      "id": 3,
-      "name": "Nashville",
-      "address": "100 Copper Drive"
-    }
-]
-
+import sqlite3
+import json
+from models import Location
+selectsql = """SELECT a.id, a.name, a.address FROM location a"""
+selectwhere = selectsql + """ WHERE a.id = ?"""
 def get_all_locations():
-    return LOCATIONS
+    # Open a connection to the database
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+
+        # Just use these. It's a Black Box.
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Write the SQL query to get the information you want
+        db_cursor.execute(selectsql )
+
+        # Initialize an empty list to hold all animal representations
+        locations = []
+
+        # Convert rows of data into a Python list
+        dataset = db_cursor.fetchall()
+
+        # Iterate list of data returned from database
+        for row in dataset:
+
+            location = Location(row['id'], row['name'], row['address'])
+            locations.append(location.__dict__)
+
+    # Use `json` package to properly serialize list as JSON
+    return json.dumps(locations)
 
 def get_single_location(id):
     # Variable to hold the found animal, if it exists
-    requested_location = None
-
-    # Iterate the ANIMALS list above. Very similar to the
-    # for..of loops you used in JavaScript.
-    for location in LOCATIONS:
-        # Dictionaries in Python use [] notation to find a key
-        # instead of the dot notation that JavaScript used.
-        if location["id"] == id:
-            requested_location = location
-    return requested_location
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute(selectwhere , ( id, ))
+        data = db_cursor.fetchone()
+        location = Location(data['id'], data['name'], data['address'])
+        return json.dumps(location.__dict__)
 
 # Function to add a location
 def create_location(location):

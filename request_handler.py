@@ -1,6 +1,6 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_animals, get_single_animal, get_all_locations, get_single_location, get_all_employees, get_single_employee, create_animal, create_employee, create_location, get_all_customers, get_single_customer, create_customer, delete_animal, delete_employee, delete_location, delete_customer, update_animal, customer_animal
+from views import get_all_animals, get_single_animal, get_all_locations, get_single_location, get_all_employees, get_single_employee, create_animal, create_employee, create_location, get_all_customers, get_single_customer, create_customer, delete_animal, delete_employee, delete_location, delete_customer, update_animal, get_customers_by_email, get_animal_by_status, get_animal_by_location, get_employee_by_location
 
 
 # Here's a class. It inherits from another class.
@@ -19,7 +19,19 @@ class HandleRequests(BaseHTTPRequestHandler):
         # at index 2.
         path_params = path.split("/")
         resource = path_params[1]
-        id = None
+        # Check if there is a query string parameter
+        if "?" in resource:
+            # GIVEN: /customers?email=jenna@solis.com
+
+            param = resource.split("?")[1]  # email=jenna@solis.com
+            resource = resource.split("?")[0]  # 'customers'
+            pair = param.split("=")  # [ 'email', 'jenna@solis.com' ]
+            key = pair[0]  # 'email'
+            value = pair[1]  # 'jenna@solis.com'
+
+            return ( resource, key, value )
+        else:
+            id = None
 
         # Try to get the item at index 2
         try:
@@ -65,47 +77,54 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Set the response code to 'Ok'
         self._set_headers(200)
         response = {} #default
-        (resource, id) = self.parse_url(self.path)
+        parsed = self.parse_url(self.path)
         # Your new console.log() that outputs to the terminal
         print(self.path)
-        customer_animal()
         # It's an if..else statement
-        if resource == "animals":
-            # In Python, this is a list of dictionaries
-            # In JavaScript, you would call it an array of objects
-            if id is not None:
-                response = f"{get_single_animal(id)}"
+        if len(parsed) == 2:
+            ( resource, id ) = parsed
+            if resource == "animals":
+                # In Python, this is a list of dictionaries
+                # In JavaScript, you would call it an array of objects
+                if id is not None:
+                    response = f"{get_single_animal(id)}"
+                else:
+                    response = f"{get_all_animals()}"
+            elif resource == "locations":
+                if id is not None:
+                    response = f"{get_single_location(id)}"
+                else:
+                    response = get_all_locations()
+            elif resource == "employees":
+                if id is not None:
+                    response = f"{get_single_employee(id)}"
+                else:
+                    response = get_all_employees()
+            elif resource == "customers":
+                if id is not None:
+                    response = f"{get_single_customer(id)}"
+                else:
+                    response = get_all_customers()                              
             else:
-                response = f"{get_all_animals()}"
-        elif resource == "locations":
-            if id is not None:
-                response = f"{get_single_location(id)}"
+                response = [] 
+        elif len(parsed) == 3:
+            ( resource, key, value ) = parsed
+            print(f"resource {resource}")
+            print(f"key, {key,}")
+            print(f"value {value}")
+            # Is the resource `customers` and was there a
+            # query parameter that specified the customer
+            # email as a filtering value?
+            if key == "email" and resource == "customers":
+                response = get_customers_by_email(value)
+            elif key == "status" and resource == "animals":
+                response = get_animal_by_status(value)
+            elif key == "location_id" and resource == "animals":
+                response = get_animal_by_location(value)
+            elif key == "location_id" and resource == "employees":
+                response = get_employee_by_location(value) 
             else:
-                response = get_all_locations()
-        elif resource == "employees":
-            if id is not None:
-                response = f"{get_single_employee(id)}"
-            else:
-                response = get_all_employees()
-        elif resource == "customers":
-            if id is not None:
-                response = f"{get_single_customer(id)}"
-            else:
-                response = get_all_customers()                              
-        else:
-            response = []  
-
-        # # It's an if..else statement
-        # if self.path == "/animals":
-        #     # In Python, this is a list of dictionaries
-        #     # In JavaScript, you would call it an array of objects
-        #     response = get_all_animals()
-        # elif self.path == "/locations":
-        #     response = get_all_locations()
-        # elif self.path == "/employees":
-        #     response = get_all_employees()            
-        # else:
-        #     response = []   
+                response = []   
 
         # This weird code sends a response back to the client
         self.wfile.write(f"{response}".encode())
